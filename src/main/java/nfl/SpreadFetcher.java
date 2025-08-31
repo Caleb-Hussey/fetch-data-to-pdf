@@ -14,13 +14,50 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
 
 class SpreadFetcher {
 
     private final DateTimeFormatter testDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.ENGLISH);
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d h:mm a", Locale.ENGLISH);
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d yyyy h:mm a", Locale.ENGLISH);
     private final ZoneId newYorkZone = ZoneId.of("America/New_York");
+    private final String[] allowedTeams = new String[]{
+            "Buffalo",
+            "Miami",
+            "New England",
+            "New York Jets",
+            "Baltimore",
+            "Cincinnati",
+            "Cleveland",
+            "Pittsburgh",
+            "Houston",
+            "Indianapolis",
+            "Jacksonville",
+            "Tennessee",
+            "Denver",
+            "Kansas City",
+            "Las Vegas",
+            "Los Angeles Chargers",
+            "Dallas",
+            "New York Giants",
+            "Philadelphia",
+            "Washington",
+            "Chicago",
+            "Detroit",
+            "Green Bay",
+            "Minnesota",
+            "Atlanta",
+            "Carolina",
+            "New Orleans",
+            "Tampa Bay",
+            "Arizona",
+            "Los Angeles Rams",
+            "San Francisco",
+            "Seattle"};
 
 
     WeeklyData fetch(String header) throws IOException, ParseException {
@@ -39,7 +76,7 @@ class SpreadFetcher {
         Document doc = Jsoup.connect(url).get();
 
         Elements spreadsByWeek = doc.select("[data-testid=\"prism-LayoutCard\"]");
-        System.out.println("Found " + spreadsByWeek.size() + " week containers");
+        // System.out.println("Found " + spreadsByWeek.size() + " week containers");
 
         Element relevantWeek = null;
         for (Element weekElement : spreadsByWeek) {
@@ -77,7 +114,7 @@ class SpreadFetcher {
 
         int numberOfGameDays = detailSections.size() / 2;
 
-        System.out.println("Number of days " + numberOfGameDays);
+        System.out.println("Number of game days " + numberOfGameDays);
 
         for (int day = 0; day < numberOfGameDays; day++) {
             rawSpreads.addAll(getSpreadsByDay(detailSections.get(2 * day),  detailSections.get(2 * day + 1)));
@@ -98,99 +135,51 @@ class SpreadFetcher {
         List<Spread> spreads = new ArrayList<>();
         for (Element game : games.children()) {
             Elements children = game.children().get(0).children().get(0).children().get(0).children();
-            String dateText = date.text() + " " + children.get(0).text();
-            System.out.println("Datetime is " + dateText);
+            String dateText = date.text() + " 2025 " + children.get(0).text();
             LocalDateTime ldt = LocalDateTime.parse(dateText, dateTimeFormatter);
             Date dateTime = Date.from(ldt.atZone(newYorkZone).toInstant());
             Spread spread = new Spread();
             spread.setDateTime(dateTime);
 
-            for (Element child : children.get(0).children().get(0).children().get(0).children()) {
-                System.out.println("Text is " + child.text());
-            }
-            
+            setTeamsAndSpreadValue(spread, children);
             spreads.add(spread);
         }
         return spreads;
     }
 
+    private void setTeamsAndSpreadValue(Spread spread, Elements elements) {
+        String firstTeam = elements.get(5).text();
+        // System.out.println("First team full string: " + firstTeam);
+        String secondTeam = elements.get(10).text();
+        // System.out.println("Second team full string: " + secondTeam);
 
-//            if (weekElement.hasClass("odds--group__details-date-container")) {
-//        System.out.println("Date container");
-//        dateCorrect = false;
-//        String elementText = groupElement.text();
-//        System.out.println("elementText " + elementText);
-//        for (String date : dates) {
-//            if (elementText.contains(date)) {
-//                dateCorrect = true;
-//                gameDate = date;
-//                System.out.println("dateCorrect true ");
-//                break;
-//            } else {
-//                System.out.println("dateCorrect false ");
-//                dateCorrect = false;
-//            }
-//        }
-//    } else if (groupElement.hasClass("odds--group__events-container football")) {
-//        System.out.println("football container");
-//        if (!dateCorrect) {
-//            continue;
-//        }
-//        Elements children = groupElement.children();
-//        System.out.println("Number of games = " + children.size());
-//        for (Element child : children) {
-//            Elements timeElements = child.getElementsByClass("odds--group__event-time");
-//            Elements participantsElements = child.getElementsByClass("odds--group__event-participants");
-//            Elements openingSpreadsElements = child.getElementsByClass("odds-spread opening");
-//
-//            if (timeElements.size() > 1) {
-//                throw new RuntimeException("Too many time elements " + timeElements.size());
-//            }
-//            if (timeElements.size() == 0) {
-//                continue;
-//            }
-//            String matchTime = timeElements.get(0).text();
-//
-//            if (participantsElements.size() != 1) {
-//                throw new RuntimeException("Unexpected number of participants elements " + participantsElements.size());
-//            }
-//            if (openingSpreadsElements.size() != 2) {
-//                throw new RuntimeException("Unexpected number of participants elements " + openingSpreadsElements.size());
-//            }
-//
-//            Element participantsElement = participantsElements.get(0);
-//            String firstTeam = participantsElement.children().get(0).children().get(0).children().get(0).text();
-//            String secondTeam = participantsElement.children().get(2).children().get(0).children().get(0).text();
-//
-//            Spread spread = new Spread();
-//
-//            String dateString = "2025 " + gameDate + " " + matchTime.trim();
-//            System.out.println(dateString);
-//            Date gameTime = formatter.parse(dateString);
-//            spread.setDateTime(gameTime);
-//
-//
-//            String spreadString = openingSpreadsElements.get(0).children().get(0).text();
-//
-//            double spreadValue = ("Ev".equals(spreadString) || "-".equals(spreadString)) ? 0.5 : Double.parseDouble(spreadString);
-//
-//            if (spreadValue > 0) {
-//                spread.setFavorite(secondTeam);
-//                spread.setUnderdog(firstTeam);
-//                spread.setSpread(spreadValue);
-//            } else {
-//                spread.setFavorite(firstTeam);
-//                spread.setUnderdog(secondTeam);
-//                spread.setSpread(-1 * spreadValue);
-//            }
-//
-//            if ((spreadValue % 1 == 0) && (spreadValue != 0)) {
-//                spread.setSpread(spread.getSpread() - 0.5);
-//            }
-//
-//            rawSpreads.add(spread);
-//
-//        }
-//    }
+        String spreadString = elements.get(7).text().split(" ")[0];
+        // System.out.println("Value text: " + spreadString);
 
+        List<String> evenValues = List.of("Ev", "-", "OFF", "0.0");
+        double spreadValue = evenValues.contains(spreadString) ? 0.5 : Double.parseDouble(spreadString);
+        if ((spreadValue % 1 == 0) && (spreadValue != 0)) {
+            spreadValue -= 0.5;
+        }
+
+        for (String team : allowedTeams) {
+            if (firstTeam.contains(team)) {
+                firstTeam = (firstTeam.contains("Home") ? "At " : "")
+                        + team.replace("Los Angeles", "LA").replace("New York", "NY");
+            } else if (secondTeam.contains(team)) {
+                secondTeam = (secondTeam.contains("Home") ? "At " : "")
+                        + team.replace("Los Angeles", "LA").replace("New York", "NY");
+            }
+        }
+
+        if (spreadValue > 0) {
+            spread.setFavorite(secondTeam);
+            spread.setUnderdog(firstTeam);
+            spread.setSpread(spreadValue);
+        } else {
+            spread.setFavorite(firstTeam);
+            spread.setUnderdog(secondTeam);
+            spread.setSpread(-1 * spreadValue);
+        }
+    }
 }

@@ -14,8 +14,6 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.util.Matrix;
 import org.vandeseer.easytable.TableDrawer;
-import org.vandeseer.easytable.settings.BorderStyle;
-import org.vandeseer.easytable.settings.HorizontalAlignment;
 import org.vandeseer.easytable.structure.Row;
 import org.vandeseer.easytable.structure.Table;
 import org.vandeseer.easytable.structure.cell.TextCell;
@@ -52,7 +50,7 @@ public class PdfMaker {
         PDPage page = new PDPage();
         document.addPage( page );
 
-        final String headerText = data.getHeader();
+        final String headerText = data.getTitle();
         float headerWidth = headerFont.getStringWidth(headerText) * headerFontSize / 1000;
         float headerHeight = headerFont.getFontDescriptor().getFontBoundingBox().getHeight() / 1000 * headerFontSize;
 

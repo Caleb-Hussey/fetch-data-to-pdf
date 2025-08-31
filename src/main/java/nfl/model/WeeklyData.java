@@ -5,17 +5,16 @@ import java.util.List;
 public class WeeklyData {
 
     // private static final String headerPrefix = "NFL Point Spreads for Week ";
-    private static final String header = "NFL Super Bowl Spread";
-    private int weekNumber;
+    private String title = "NFL Super Bowl Spread";
     private List<Spread> spreads;
 
-    public String getHeader() {
-        return header;
+    public String getTitle() {
+        return title;
         // return headerPrefix + weekNumber;
     }
 
-    public void setWeekNumber(int weekNumber) {
-        this.weekNumber = weekNumber;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public List<Spread> getSpreads() {
