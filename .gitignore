@@ -1,0 +1,15 @@
+# Generated Result files
+*.pdf
+*.csv
+
+# Properties
+*.properties
+
+# Compiled files
+target*
+
+# Intellij Project files
+.idea*
+
+# Icons
+src/main/resources/*
