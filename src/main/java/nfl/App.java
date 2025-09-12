@@ -26,7 +26,6 @@ public class App
         try {
             if (shouldRefetchSpreads) {
                 data = spreadFetcher.fetch(fetchHeader);
-                data.setTitle(title);
             }
         } catch (Exception ex) {
             System.out.println("Exception fetching: " + ex.getMessage());
@@ -45,6 +44,7 @@ public class App
         try {
             readData = new WeeklyData();
             readData.setSpreads(converter.read(tempFile));
+            readData.setTitle(title);
             //System.out.println("CHY " + readData.getSpreads());
         } catch (Exception ex) {
             System.out.println("Exception reading: " + ex.getMessage());
