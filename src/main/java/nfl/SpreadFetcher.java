@@ -25,6 +25,8 @@ class SpreadFetcher {
     private final DateTimeFormatter testDateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.ENGLISH);
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d yyyy h:mm a", Locale.ENGLISH);
     private final ZoneId newYorkZone = ZoneId.of("America/New_York");
+    private final DateTimeFormatter dateTimeFormatterAlternative = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'", Locale.ENGLISH);
+    private final ZoneId zuluZone = ZoneId.of("UTC");
     private final String[] allowedTeams = new String[]{
             "Buffalo",
             "Miami",
@@ -136,8 +138,16 @@ class SpreadFetcher {
         for (Element game : games.children()) {
             Elements children = game.children().get(0).children().get(0).children().get(0).children();
             String dateText = date.text() + " 2025 " + children.get(0).text();
-            LocalDateTime ldt = LocalDateTime.parse(dateText, dateTimeFormatter);
-            Date dateTime = Date.from(ldt.atZone(newYorkZone).toInstant());
+            Date dateTime;
+            try {
+                LocalDateTime ldt = LocalDateTime.parse(dateText, dateTimeFormatter);
+                dateTime = Date.from(ldt.atZone(newYorkZone).toInstant());
+            } catch (Exception ex) {
+                System.out.println("Using alternative");
+                LocalDateTime ldt = LocalDateTime.parse(children.get(0).text(), dateTimeFormatterAlternative);
+                dateTime = Date.from(ldt.atZone(zuluZone).toInstant());
+            }
+
             Spread spread = new Spread();
             spread.setDateTime(dateTime);
 
