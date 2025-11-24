@@ -28,38 +28,38 @@ class SpreadFetcher {
     private final DateTimeFormatter dateTimeFormatterAlternative = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'", Locale.ENGLISH);
     private final ZoneId zuluZone = ZoneId.of("UTC");
     private final String[] allowedTeams = new String[]{
-            "Buffalo",
-            "Miami",
-            "New England",
-            "New York Jets",
+            "Arizona",
+            "Atlanta",
             "Baltimore",
+            "Buffalo",
+            "Carolina",
+            "Chicago",
             "Cincinnati",
             "Cleveland",
-            "Pittsburgh",
+            "Dallas",
+            "Denver",
+            "Detroit",
+            "Green Bay",
             "Houston",
             "Indianapolis",
             "Jacksonville",
-            "Tennessee",
-            "Denver",
             "Kansas City",
             "Las Vegas",
             "Los Angeles Chargers",
-            "Dallas",
-            "New York Giants",
-            "Philadelphia",
-            "Washington",
-            "Chicago",
-            "Detroit",
-            "Green Bay",
-            "Minnesota",
-            "Atlanta",
-            "Carolina",
-            "New Orleans",
-            "Tampa Bay",
-            "Arizona",
             "Los Angeles Rams",
+            "Miami",
+            "Minnesota",
+            "New England",
+            "New Orleans",
+            "New York Giants",
+            "New York Jets",
+            "Philadelphia",
+            "Pittsburgh",
             "San Francisco",
-            "Seattle"};
+            "Seattle",
+            "Tampa Bay",
+            "Tennessee",
+            "Washington"};
 
 
     WeeklyData fetch(String header) throws IOException, ParseException {
@@ -114,6 +114,11 @@ class SpreadFetcher {
         WeeklyData data = new WeeklyData();
         List<Spread> rawSpreads = new ArrayList<>();
 
+        List<String> byeWeekTeams = new ArrayList<>();
+        for (String team : allowedTeams) {
+            byeWeekTeams.add(team.replace("Los Angeles", "LA").replace("New York", "NY"));
+        }
+
         int numberOfGameDays = detailSections.size() / 2;
 
         System.out.println("Number of game days " + numberOfGameDays);
@@ -123,6 +128,12 @@ class SpreadFetcher {
         }
 
         data.setSpreads(rawSpreads);
+
+        for (Spread spread : rawSpreads) {
+            byeWeekTeams.remove(spread.getFavorite().replace("At ", ""));
+            byeWeekTeams.remove(spread.getUnderdog().replace("At ", ""));
+        }
+        data.setByeWeekTeams(byeWeekTeams);
         return data;
     }
 

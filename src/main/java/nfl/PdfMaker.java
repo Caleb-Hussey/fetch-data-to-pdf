@@ -3,6 +3,7 @@ package nfl;
 import java.awt.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.TimeZone;
 
 import nfl.model.Spread;
@@ -29,6 +30,8 @@ public class PdfMaker {
     private static final PDFont spreadHeaderFont = PDType1Font.HELVETICA_BOLD;
     private static final PDFont spreadFont = HELVETICA;
     private static final int spreadFontSize = 14;
+    private static final PDFont byeWeekFont = HELVETICA;
+    private static final int byeWeekFontSize = 12;
 
     private static final String header_date = "Date & Time";
     private static final String header_favorite = "Favorite";
@@ -39,7 +42,7 @@ public class PdfMaker {
 
 
 
-    public void make(WeeklyData data, String savePath, int horizontal_line_position) throws IOException {
+    public void make(WeeklyData data, String savePath, int horizontal_line_position, boolean shouldIncludeByeWeeks) throws IOException {
         TimeZone etTimeZone = TimeZone.getTimeZone("America/New_York");
         dateFormat.setTimeZone(etTimeZone);
 
@@ -101,6 +104,20 @@ public class PdfMaker {
         // And go for it!
         tableDrawer.draw();
 
+
+
+        String byeWeekText = getByeWeekText(data.getByeWeekTeams(), shouldIncludeByeWeeks);
+        System.out.println(byeWeekText);
+        contentStream.beginText();
+        contentStream.setFont( byeWeekFont, byeWeekFontSize );
+
+        float byeTextX = 100F;
+        float byeTextY = tableDrawer.getFinalY() - 50;
+        contentStream.setTextMatrix(Matrix.getTranslateInstance(byeTextX, byeTextY));
+
+        contentStream.showText(byeWeekText);
+        contentStream.endText();
+
         // Make sure that the content stream is closed:
         contentStream.close();
 
@@ -148,5 +165,23 @@ public class PdfMaker {
         }
 
         return tableBuilder.build();
+    }
+
+    private String getByeWeekText(List<String> byeWeekTeams, boolean shouldIncludeByeWeeks) {
+        if (!shouldIncludeByeWeeks) {
+            return "";
+        }
+        if (byeWeekTeams == null || byeWeekTeams.size() == 0) {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append("Byes: ");
+        for (int i=0; i < byeWeekTeams.size(); i++) {
+            builder.append(byeWeekTeams.get(i));
+            if (i < byeWeekTeams.size() - 1) {
+                builder.append(", ");
+            }
+        }
+        return builder.toString();
     }
 }

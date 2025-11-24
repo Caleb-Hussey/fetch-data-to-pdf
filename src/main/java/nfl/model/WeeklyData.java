@@ -7,6 +7,7 @@ public class WeeklyData {
     // private static final String headerPrefix = "NFL Point Spreads for Week ";
     private String title = null;
     private List<Spread> spreads;
+    private List<String> byeWeekTeams;
 
     public String getTitle() {
         if (title == null) {
@@ -26,5 +27,13 @@ public class WeeklyData {
 
     public void setSpreads(List<Spread> spreads) {
         this.spreads = spreads;
+    }
+
+    public List<String> getByeWeekTeams() {
+        return byeWeekTeams;
+    }
+
+    public void setByeWeekTeams(List<String> byeWeekTeams) {
+        this.byeWeekTeams = byeWeekTeams;
     }
 }

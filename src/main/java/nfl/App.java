@@ -36,7 +36,8 @@ public class App
 
         try {
             if (shouldRefetchSpreads) {
-                converter.write(data.getSpreads(), tempFile);
+                converter.writeSpreads(data.getSpreads(), tempSpreadsFile);
+                converter.writeByeWeeks(data.getByeWeekTeams(), tempByeWeeksFile);
             }
         } catch (Exception ex) {
             System.out.println("Exception writing: " + ex.getMessage());
@@ -45,7 +46,8 @@ public class App
 
         try {
             readData = new WeeklyData();
-            readData.setSpreads(converter.read(tempFile));
+            readData.setSpreads(converter.readSpreads(tempSpreadsFile));
+            readData.setByeWeekTeams(converter.readByeWeeks(tempByeWeeksFile));
             readData.setTitle(title);
             //System.out.println("CHY " + readData.getSpreads());
         } catch (Exception ex) {
@@ -54,10 +56,9 @@ public class App
         }
 
         try {
-            pdfMaker.make(readData, filename, horizontal_line_position);
+            pdfMaker.make(readData, filename, horizontal_line_position, shouldIncludeByeWeeks);
         } catch (Exception ex) {
             System.out.println("Exception making pdf: " + ex.getMessage());
-            return;
         }
     }
 }
