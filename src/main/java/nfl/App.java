@@ -17,12 +17,12 @@ public class App
         PdfMaker pdfMaker = new PdfMaker();
         SpreadFetcher spreadFetcher = new SpreadFetcher();
         CsvConverter converter = new CsvConverter();
-        String fetchHeader = "Week 13";
-        String filename = "NFL Week 13 Spreads.pdf";
-        String title = "NFL Week 13 Spreads";
+        String fetchHeader = "Week 14";
+        String filename = "NFL Week 14 Spreads.pdf";
+        String title = "NFL Week 14 Spreads";
         boolean shouldRefetchSpreads = true;
         boolean shouldIncludeByeWeeks = true;
-        int horizontal_line_position = 4;
+        int horizontal_line_position = 1;
         WeeklyData data = null;
         WeeklyData readData;
         try {
