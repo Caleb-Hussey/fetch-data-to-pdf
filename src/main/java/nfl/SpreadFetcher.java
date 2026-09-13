@@ -6,6 +6,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -75,10 +77,14 @@ class SpreadFetcher {
         // SimpleDateFormat formatter = new SimpleDateFormat("y MMMM d h:mmaa z", Locale.ENGLISH);
         // formatter.setTimeZone(TimeZone.getTimeZone("America/New_York"));
 
-        Document doc = Jsoup.connect(url).get();
+        WebDriver driver = new ChromeDriver();
+        driver.get(url);
+        String html = driver.getPageSource();
+        Document doc = Jsoup.parse(html);
+        driver.quit();
 
         Elements spreadsByWeek = doc.select("[data-testid=\"prism-LayoutCard\"]");
-        // System.out.println("Found " + spreadsByWeek.size() + " week containers");
+        System.out.println("Found " + spreadsByWeek.size() + " week containers");
 
         Element relevantWeek = null;
         for (Element weekElement : spreadsByWeek) {
@@ -92,7 +98,8 @@ class SpreadFetcher {
             throw new RuntimeException("Could not find header");
         }
 
-        Elements detailSections = relevantWeek.children().get(1).children();
+        Elements detailSections = relevantWeek.children().get(1).children().get(0).children();
+        System.out.println("Sections " + detailSections.size());
         if (detailSections.size() % 2 == 1) {
             throw new RuntimeException("Found unexpected odd number of detail sections");
         }
