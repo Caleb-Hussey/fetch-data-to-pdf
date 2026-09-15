@@ -155,16 +155,12 @@ class SpreadFetcher {
         List<Spread> spreads = new ArrayList<>();
         for (Element game : games.children()) {
             Elements children = game.children().get(0).children().get(0).children().get(0).children();
-            String dateText = date.text() + " 2025 " + children.get(0).text();
-            Date dateTime;
-            try {
-                LocalDateTime ldt = LocalDateTime.parse(dateText, dateTimeFormatter);
-                dateTime = Date.from(ldt.atZone(newYorkZone).toInstant());
-            } catch (Exception ex) {
-                System.out.println("Using alternative");
-                LocalDateTime ldt = LocalDateTime.parse(children.get(0).text(), dateTimeFormatterAlternative);
-                dateTime = Date.from(ldt.atZone(zuluZone).toInstant());
-            }
+            // String dateText = date.text() + " 2025 " + children.get(0).text();
+            // LocalDateTime ldt = LocalDateTime.parse(dateText, dateTimeFormatter);
+            // dateTime = Date.from(ldt.atZone(newYorkZone).toInstant());
+
+            LocalDateTime ldt = LocalDateTime.parse(children.get(0).text(), dateTimeFormatterAlternative);
+            Date dateTime = Date.from(ldt.atZone(zuluZone).toInstant());
 
             Spread spread = new Spread();
             spread.setDateTime(dateTime);
@@ -184,7 +180,8 @@ class SpreadFetcher {
         String spreadString = elements.get(7).text().split(" ")[0];
         // System.out.println("Value text: " + spreadString);
 
-        List<String> evenValues = List.of("Ev", "-", "OFF", "0.0");
+
+        List<String> evenValues = List.of("Ev", "-", "--", "OFF", "0.0");
         double spreadValue = evenValues.contains(spreadString) ? 0.5 : Double.parseDouble(spreadString);
         if ((spreadValue % 1 == 0) && (spreadValue != 0)) {
             spreadValue -= 0.5;
