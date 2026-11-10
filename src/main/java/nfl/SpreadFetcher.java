@@ -155,12 +155,14 @@ class SpreadFetcher {
         List<Spread> spreads = new ArrayList<>();
         for (Element game : games.children()) {
             Elements children = game.children().get(0).children().get(0).children().get(0).children();
-            // String dateText = date.text() + " 2025 " + children.get(0).text();
-            // LocalDateTime ldt = LocalDateTime.parse(dateText, dateTimeFormatter);
-            // dateTime = Date.from(ldt.atZone(newYorkZone).toInstant());
+            String dateText = date.text() + " 2026 " + children.get(0).text();
+            System.out.println("dateText: " + dateText);
+            LocalDateTime ldt = LocalDateTime.parse(dateText, dateTimeFormatter);
+            Date dateTime = Date.from(ldt.atZone(ZoneId.of("Europe/Berlin")).toInstant());
 
-            LocalDateTime ldt = LocalDateTime.parse(children.get(0).text(), dateTimeFormatterAlternative);
-            Date dateTime = Date.from(ldt.atZone(zuluZone).toInstant());
+            // System.out.println("LocalDateTime: " + children.get(0).text());
+            // LocalDateTime ldt = LocalDateTime.parse(children.get(0).text(), dateTimeFormatterAlternative);
+            // Date dateTime = Date.from(ldt.atZone(zuluZone).toInstant());
 
             Spread spread = new Spread();
             spread.setDateTime(dateTime);
@@ -173,12 +175,12 @@ class SpreadFetcher {
 
     private void setTeamsAndSpreadValue(Spread spread, Elements elements) {
         String firstTeam = elements.get(5).text();
-        // System.out.println("First team full string: " + firstTeam);
+        System.out.println("First team full string: " + firstTeam);
         String secondTeam = elements.get(10).text();
-        // System.out.println("Second team full string: " + secondTeam);
+        System.out.println("Second team full string: " + secondTeam);
 
         String spreadString = elements.get(7).text().split(" ")[0];
-        // System.out.println("Value text: " + spreadString);
+        System.out.println("Value text: " + spreadString);
 
 
         List<String> evenValues = List.of("Ev", "-", "--", "OFF", "0.0");
